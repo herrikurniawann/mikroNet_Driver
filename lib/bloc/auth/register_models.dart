@@ -6,11 +6,12 @@ import 'package:ridehailing/view/auth/login_view.dart';
 
 class RegisterViewModel extends ChangeNotifier {
   final AuthRepository _authRepository = AuthRepository();
-  
+
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController passwordConfirmationController = TextEditingController();
+  final TextEditingController passwordConfirmationController =
+      TextEditingController();
 
   bool isObscure = true;
   File? profileImage;
@@ -55,6 +56,7 @@ class RegisterViewModel extends ChangeNotifier {
       passwordConfirmation: passwordConfirmationController.text,
       profileImage: profileImage!,
     );
+
 
     if (success) {
       if (!context.mounted) return;

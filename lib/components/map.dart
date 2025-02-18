@@ -66,7 +66,7 @@ class _MapScreenState extends State<MapScreen> {
               Marker(
                 width: 80.0,
                 height: 80.0,
-                point: LatLng(1.4638, 124.8104), // Titik awal
+                point: LatLng(1.4748, 124.8421),
                 child: Icon(
                   Icons.location_on,
                   color: Colors.transparent,
@@ -76,7 +76,7 @@ class _MapScreenState extends State<MapScreen> {
               Marker(
                 width: 80.0,
                 height: 80.0,
-                point: LatLng(1.4748, 124.8421), // Titik akhir
+                point: LatLng(1.4638, 124.8104),
                 child: Icon(
                   Icons.location_on,
                   color: Colors.transparent,
