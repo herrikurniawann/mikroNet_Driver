@@ -5,6 +5,6 @@ class ResetPasswordRepository {
   final ResetPasswordService _resetPasswordService = ResetPasswordService();
 
   Future<Map<String, dynamic>> resetPassword(String email, Driver driver) async {
-    return await _resetPasswordService.requestResetPassword(email, driver);
+    return await _resetPasswordService.requestResetPassword(email);
   }
 }

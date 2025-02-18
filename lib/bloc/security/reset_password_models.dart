@@ -5,7 +5,7 @@ import 'package:ridehailing/bloc/data.dart';
 class ResetPasswordViewModel extends ChangeNotifier {
   final ResetPasswordRepository _repository = ResetPasswordRepository();
   final TextEditingController emailController = TextEditingController();
-  Driver? _driver; // Menyimpan instance Driver
+  Driver? _driver;
 
   bool _isLoading = false;
   String _errorMessage = '';
@@ -13,7 +13,6 @@ class ResetPasswordViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
-  // Fungsi untuk menyetel Driver dari luar
   void setDriver(Driver driver) {
     _driver = driver;
     notifyListeners();

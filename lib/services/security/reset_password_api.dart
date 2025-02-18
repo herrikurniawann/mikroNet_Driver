@@ -1,13 +1,12 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:ridehailing/bloc/data.dart';
 
 class ResetPasswordService {
-  final String baseUrl = 'http://188.166.179.146:8000/api/auth/reset-password';
+  final String resetPasswordUrl = 'http://188.166.179.146:8000/api/auth/reset-password';
 
-  Future<Map<String, dynamic>> requestResetPassword(String email, Driver driver) async {
+  Future<Map<String, dynamic>> requestResetPassword(String email) async {
     try {
-      final Uri url = Uri.parse('$baseUrl/${driver.id}');
+      final Uri url = Uri.parse(resetPasswordUrl);
 
       final response = await http.post(
         url,

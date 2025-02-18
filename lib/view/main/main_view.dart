@@ -3,6 +3,7 @@ import 'package:ridehailing/components/map.dart';
 import 'package:ridehailing/services/profile_main_services.dart';
 import 'package:ridehailing/bloc/data.dart';
 import 'package:ridehailing/view/profile/profile_view.dart';
+import 'package:ridehailing/services/driver_services.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -13,13 +14,40 @@ class MainView extends StatefulWidget {
 
 class _MainViewState extends State<MainView> {
   Driver? driver;
-  final isOnline = true;
+  bool isOnline = false;
   final TextEditingController nameController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     fetchDriverData();
+    fetchDriverStatus();
+  }
+
+  Future<void> fetchDriverStatus() async {
+    try {
+      bool status = await DriverStatusService.getDriverStatus();
+      setState(() {
+        isOnline = status;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
+  Future<void> toggleOnlineStatus() async {
+    try {
+      bool newStatus = await DriverStatusService.updateDriverStatus(!isOnline);
+      setState(() {
+        isOnline = newStatus;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
   }
 
   Future<void> fetchDriverData() async {
@@ -53,9 +81,7 @@ class _MainViewState extends State<MainView> {
                 radius: 22,
                 backgroundImage: NetworkImage(driver?.profilePictureUrl ?? ''),
               ),
-              const SizedBox(
-                width: 8,
-              ),
+              const SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -86,7 +112,7 @@ class _MainViewState extends State<MainView> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: toggleOnlineStatus,
               style: ElevatedButton.styleFrom(
                 backgroundColor: isOnline ? Colors.green : Colors.red,
                 shape: RoundedRectangleBorder(

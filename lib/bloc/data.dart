@@ -23,7 +23,7 @@ class Driver {
       sim: data['SIM'] ?? 'No SIM provided',
       licenseNumber: data['license_number'] ?? 'No License provided',
       profilePictureUrl: data['image'] ??
-          'http://188.166.179.146:8000/api/driver/images${data['id']}',
+          'http://188.166.179.146:8000/api/driver/images/${data['id']}',
     );
   }
 }
