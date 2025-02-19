@@ -45,7 +45,7 @@ class LoginViewModel extends ChangeNotifier {
       if (!context.mounted) return;
 
       if (result['success'] == true) {
-        final token = result['token'];
+        final token = result['access_token'];
 
         if (token == null) {
           ScaffoldMessenger.of(context).showSnackBar(

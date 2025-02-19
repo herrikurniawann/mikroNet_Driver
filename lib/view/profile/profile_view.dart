@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ridehailing/view/auth/login_view.dart';
+import 'package:ridehailing/components/logout_button.dart';
 import 'package:ridehailing/services/profile_main_services.dart';
 import 'package:ridehailing/bloc/data.dart';
-import 'package:ridehailing/components/localstorage_models.dart';
 import 'package:ridehailing/view/security/change_password_view.dart';
 
 class ProfileView extends StatefulWidget {
@@ -305,35 +304,7 @@ class _ProfileViewState extends State<ProfileView> {
                             ),
                           ),
                           const SizedBox(height: 5),
-                          SizedBox(
-                            width: 170,
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                await LocalStorage.clearToken();
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LoginPage(),
-                                  ),
-                                  (route) => false,
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color.fromARGB(255, 255, 0, 0),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: const Text(
-                                'Keluar',
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.white),
-                              ),
-                            ),
-                          ),
+                          const LogoutButton(),
                         ],
                       ),
                     ),
