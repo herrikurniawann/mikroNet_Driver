@@ -72,7 +72,7 @@ class LoginViewModel extends ChangeNotifier {
         // 🔹 Navigasi ke halaman utama
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const MainView()),
+          MaterialPageRoute(builder: (context) => MainView()),
           (Route<dynamic> route) => false,
         );
       } else {
@@ -108,7 +108,7 @@ class LoginViewModel extends ChangeNotifier {
     if (isLoggedIn && context.mounted) {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const MainView()),
+        MaterialPageRoute(builder: (context) => MainView()),
         (Route<dynamic> route) => false,
       );
     }

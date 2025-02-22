@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ridehailing/bloc/auth/register_models.dart';
+import 'package:ridehailing/testing.dart';
 import 'package:ridehailing/view/auth/login_view.dart';
 import 'package:ridehailing/bloc/auth/login_models.dart';
 import 'package:ridehailing/view/main/main_view.dart';
@@ -35,7 +36,7 @@ class MainApp extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.data == true) {
-            return const MainView();
+            return MainView();
           } else {
             return const LoginPage();
           }

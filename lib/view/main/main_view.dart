@@ -1,9 +1,15 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:ridehailing/components/map.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:ridehailing/components/maps.dart';
+import 'package:ridehailing/services/driver_services.dart';
 import 'package:ridehailing/services/profile_main_services.dart';
 import 'package:ridehailing/bloc/data.dart';
 import 'package:ridehailing/view/profile/profile_view.dart';
-import 'package:ridehailing/services/driver_services.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:ridehailing/components/localstorage_models.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -16,6 +22,8 @@ class _MainViewState extends State<MainView> {
   Driver? driver;
   bool isOnline = false;
   final TextEditingController nameController = TextEditingController();
+  WebSocketChannel? channel;
+  Timer? locationUpdateTimer;
 
   @override
   void initState() {
@@ -27,40 +35,100 @@ class _MainViewState extends State<MainView> {
   Future<void> fetchDriverStatus() async {
     try {
       bool status = await DriverStatusService.getDriverStatus();
+      if (!mounted) return;
       setState(() {
         isOnline = status;
       });
+      _manageWebSocket();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      print('Error fetching driver status: $e');
     }
   }
 
   Future<void> toggleOnlineStatus() async {
     try {
       bool newStatus = await DriverStatusService.updateDriverStatus(!isOnline);
+      if (!mounted) return;
       setState(() {
         isOnline = newStatus;
       });
+      _manageWebSocket();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      print('Error updating driver status: $e');
     }
+  }
+
+  void _manageWebSocket() {
+    if (isOnline) {
+      _connectWebSocket();
+    } else {
+      _disconnectWebSocket();
+    }
+  }
+
+  Future<void> _connectWebSocket() async {
+    final token = await LocalStorage.getToken();
+    if (token == null) {
+      print('Error: Token not found');
+      return;
+    }
+
+    final wsUrl = 'ws://188.166.179.146:8000/api/tracking/ws/location';
+    print('Connecting to WebSocket: $wsUrl');
+
+    try {
+      channel = IOWebSocketChannel.connect(
+        Uri.parse(wsUrl),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      channel!.stream.listen((message) {
+        print('Received message: $message');
+      }, onError: (error) {
+        print('WebSocket Error: $error');
+      }, onDone: () {
+        print('WebSocket Connection Closed');
+      });
+
+      _startLocationUpdates();
+    } catch (e) {
+      print('Failed to connect WebSocket: $e');
+    }
+  }
+
+  void _disconnectWebSocket() {
+    locationUpdateTimer?.cancel();
+    channel?.sink.close();
+    channel = null;
+    print('WebSocket disconnected');
+  }
+
+  void _startLocationUpdates() {
+    locationUpdateTimer?.cancel();
+    locationUpdateTimer = Timer.periodic(Duration(seconds: 10), (timer) async {
+      Position position = await Geolocator.getCurrentPosition();
+      final data = {
+        "user_id": driver?.id,
+        "lat": position.latitude,
+        "lng": position.longitude
+      };
+      channel?.sink.add(jsonEncode(data));
+    });
   }
 
   Future<void> fetchDriverData() async {
     try {
       final data = await ApiService.fetchDriver();
+      if (!mounted) return;
       setState(() {
         driver = data;
         nameController.text = data.name;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      print('Error fetching driver data: $e');
     }
   }
 
@@ -134,54 +202,6 @@ class _MainViewState extends State<MainView> {
       body: Column(
         children: [
           const Expanded(child: MapScreen()),
-          Container(
-            padding: const EdgeInsets.all(16.0),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24),
-                topRight: Radius.circular(24),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  offset: Offset(0, -5),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Rute yang tersedia',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _buildRouteItem('Jl. R.W. Monginsidi  -> Tugu Zero Point'),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRouteItem(String route) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        children: [
-          const Icon(Icons.local_taxi, color: Color(0xFF4678A5), size: 26),
-          const SizedBox(width: 12),
-          Text(
-            route,
-            style: const TextStyle(fontSize: 15, color: Colors.black87),
-          ),
         ],
       ),
     );

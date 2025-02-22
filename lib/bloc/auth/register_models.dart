@@ -57,7 +57,6 @@ class RegisterViewModel extends ChangeNotifier {
       profileImage: profileImage!,
     );
 
-
     if (success) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
