@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:ridehailing/components/localstorage_models.dart';
-import 'package:ridehailing/services/driver_services.dart';
+import 'package:ridehailing/models/localstorage_models.dart';
+import 'package:ridehailing/controllers/driver_services.dart';
 
 class TrackingScreen extends StatefulWidget {
   @override
@@ -51,7 +51,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
       return;
     }
 
-    final wsUrl = 'ws://188.166.179.146:8000/api/tracking/ws/location';
+    const wsUrl = 'ws://188.166.179.146:8000/api/tracking/ws/location';
     print('Menghubungkan ke WebSocket: $wsUrl');
 
     try {
@@ -132,14 +132,14 @@ class _TrackingScreenState extends State<TrackingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Tracking Driver")),
+      appBar: AppBar(title: const Text("Tracking Driver")),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               isOnline ? "🟢 Online" : "🔴 Offline",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
             ElevatedButton(

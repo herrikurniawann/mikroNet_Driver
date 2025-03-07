@@ -1,5 +1,5 @@
-import 'package:ridehailing/services/security/reset_password_api.dart';
-import 'package:ridehailing/bloc/data.dart';
+import 'package:ridehailing/controllers/security/reset_password_api.dart';
+import 'package:ridehailing/models/data.dart';
 
 class ResetPasswordRepository {
   final ResetPasswordService _resetPasswordService = ResetPasswordService();

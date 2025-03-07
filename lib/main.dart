@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ridehailing/bloc/auth/register_models.dart';
-import 'package:ridehailing/testing.dart';
-import 'package:ridehailing/view/auth/login_view.dart';
-import 'package:ridehailing/bloc/auth/login_models.dart';
-import 'package:ridehailing/view/main/main_view.dart';
+import 'package:ridehailing/models/auth/register_models.dart';
+import 'package:ridehailing/views/auth/login_view.dart';
+import 'package:ridehailing/models/auth/login_models.dart';
+import 'package:ridehailing/views/main/main_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,14 +28,14 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: 'ridehailingdriver',
       theme: ThemeData(visualDensity: VisualDensity.adaptivePlatformDensity),
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: true,
       home: FutureBuilder<bool>(
         future: loginViewModel.checkLoginStatus(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.data == true) {
-            return MainView();
+            return const MainView();
           } else {
             return const LoginPage();
           }
