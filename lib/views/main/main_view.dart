@@ -201,7 +201,7 @@ class _MainViewState extends State<MainView> {
       ),
       body: const Column(
         children: [
-          const Expanded(child: MapScreen()),
+          Expanded(child: MapScreen()),
         ],
       ),
     );
