@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ridehailing/models/security/change_password_models.dart';
 import 'package:ridehailing/views/widget/auth_form.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ChangePasswordView extends StatelessWidget {
   const ChangePasswordView({super.key});
@@ -13,8 +14,13 @@ class ChangePasswordView extends StatelessWidget {
       child: Consumer<ChangePasswordViewModel>(
         builder: (context, viewModel, child) {
           return Scaffold(
+            backgroundColor: Colors.white,
             appBar: AppBar(
-              title: const Text('Change Password'),
+              title: SvgPicture.asset(
+                'assets/svg/logo_ride.svg',
+                height: 40,
+                width: 30,
+              ),
               centerTitle: true,
             ),
             body: Center(
@@ -23,63 +29,66 @@ class ChangePasswordView extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Image.asset('assets/images/reset-password.png', width: 150),
+                    Image.asset('assets/images/bg_pw_2.png', width: 250),
                     const SizedBox(height: 10),
                     const SizedBox(
                       width: 290,
                       child: Text(
-                        'Silakan masukkan password lama Anda, lalu buat password baru yang kuat',
+                        'Masukkan password lama Anda, lalu buat password baru yang kuat',
                         style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
+                          color: Colors.grey,
+                          fontSize: 14,
                         ),
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     AuthFormFields.buildPasswordField(
                       controller: viewModel.oldPasswordController,
                       label: 'Password Lama',
                       isObscure: viewModel.isObscure,
                       onToggleObscure: viewModel.toggleObscure,
                     ),
-                    const SizedBox(height: 10),
                     AuthFormFields.buildPasswordField(
                       controller: viewModel.newPasswordController,
                       label: 'Password Baru',
                       isObscure: viewModel.isObscure,
                       onToggleObscure: viewModel.toggleObscure,
                     ),
-                    const SizedBox(height: 10),
                     AuthFormFields.buildPasswordField(
                       controller: viewModel.confirmPasswordController,
                       label: 'Konfirmasi Password',
                       isObscure: viewModel.isObscure,
                       onToggleObscure: viewModel.toggleObscure,
                     ),
-                    const SizedBox(height: 20),
                     SizedBox(
-                      width: 285,
-                      child: ElevatedButton(
-                        onPressed: viewModel.isLoading
-                            ? null
-                            : () => viewModel.changePassword(context),
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
+                      width: 300,
+                      height: 60,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: ElevatedButton(
+                          onPressed: viewModel.isLoading
+                              ? null
+                              : () => viewModel.changePassword(context),
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            backgroundColor:
+                                const Color.fromARGB(255, 0x29, 0x45, 0x5F),
                           ),
-                          backgroundColor: const Color(0xFF4678A5),
-                        ),
-                        child: viewModel.isLoading
-                            ? const CircularProgressIndicator(color: Colors.white)
-                            : const Text(
-                                'Change Password',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
+                          child: viewModel.isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white)
+                              : const Text(
+                                  'Change Password',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
+                        ),
                       ),
                     ),
                   ],

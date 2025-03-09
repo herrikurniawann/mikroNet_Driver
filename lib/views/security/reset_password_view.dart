@@ -14,6 +14,7 @@ class ResetPasswordView extends StatelessWidget {
       child: Consumer<ResetPasswordViewModel>(
         builder: (context, viewModel, child) {
           return Scaffold(
+            backgroundColor: Colors.white,
             appBar: AppBar(
               title: SvgPicture.asset(
                 'assets/svg/logo_ride.svg',
@@ -26,7 +27,10 @@ class ResetPasswordView extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Image.asset('assets/images/pw.jpg', width: 250),
+                  Image.asset(
+                    'assets/images/bg_pw.png',
+                    width: 250,
+                  ),
                   const SizedBox(height: 10),
                   const Text(
                     'Reset Password',
