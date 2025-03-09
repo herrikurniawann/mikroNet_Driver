@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:ridehailing/repositories/security/reset_password_repo.dart';
-import 'package:ridehailing/models/data.dart';
+import 'package:ridehailing/controllers/security/reset_password_api.dart';
 
 class ResetPasswordViewModel extends ChangeNotifier {
-  final ResetPasswordRepository _repository = ResetPasswordRepository();
+  final ResetPasswordService _resetPasswordService = ResetPasswordService();
   final TextEditingController emailController = TextEditingController();
-  Driver? _driver;
 
   bool _isLoading = false;
   String _errorMessage = '';
 
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
-
-  void setDriver(Driver driver) {
-    _driver = driver;
-    notifyListeners();
-  }
 
   Future<void> resetPassword(BuildContext context) async {
     final String email = emailController.text.trim();
@@ -29,30 +22,22 @@ class ResetPasswordViewModel extends ChangeNotifier {
       return;
     }
 
-    if (_driver == null) {
-      _errorMessage = 'Data pengguna tidak ditemukan';
-      notifyListeners();
-      if (context.mounted) {
-        showSnackBar(context, _errorMessage, Colors.red);
-      }
-      return;
-    }
-
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
 
     if (context.mounted) {
-      showSnackBar(context, 'Memproses permintaan reset password...', Colors.blue);
+      showSnackBar(
+          context, 'Memproses permintaan reset password...', Colors.blue);
     }
 
     try {
-      final result = await _repository.resetPassword(email, _driver!);
+      final result = await _resetPasswordService.requestResetPassword(email);
       _isLoading = false;
       notifyListeners();
 
       if (context.mounted) {
-        if (result['success']) {
+        if (result['success'] == true) {
           showSnackBar(context, 'Sukses: ${result['message']}', Colors.green);
           emailController.clear();
         } else {

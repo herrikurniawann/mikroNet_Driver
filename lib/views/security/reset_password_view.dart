@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:ridehailing/models/security/reset_password_models.dart';
 import 'package:ridehailing/views/widget/auth_form.dart';
@@ -14,54 +15,66 @@ class ResetPasswordView extends StatelessWidget {
         builder: (context, viewModel, child) {
           return Scaffold(
             appBar: AppBar(
-              title: const Text('Reset Password'),
+              title: SvgPicture.asset(
+                'assets/svg/logo_ride.svg',
+                height: 40,
+                width: 30,
+              ),
               centerTitle: true,
             ),
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Image.asset('assets/images/password-strenght.png',
-                      width: 150),
+                  Image.asset('assets/images/pw.jpg', width: 250),
                   const SizedBox(height: 10),
-                  const SizedBox(
-                    width: 290,
-                    child: Text(
-                      'Masukkan alamat email Anda untuk menerima tautan reset password.',
-                      style: TextStyle(fontSize: 18),
-                      textAlign: TextAlign.center,
+                  const Text(
+                    'Reset Password',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 0x29, 0x45, 0x5F),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    child: AuthFormFields.buildTextField(
-                      controller: viewModel.emailController,
-                      label: 'Email',
-                      icon: Icons.email,
+                  const Text(
+                    'Masukan email untuk mereset password anda',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
                     ),
+                  ),
+                  AuthFormFields.buildTextField(
+                    controller: viewModel.emailController,
+                    label: 'Email',
+                    icon: Icons.email,
                   ),
                   SizedBox(
-                    width: 290,
-                    child: ElevatedButton(
-                      onPressed: viewModel.isLoading
-                          ? null
-                          : () => viewModel.resetPassword(context),
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                    width: 300,
+                    height: 60,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: ElevatedButton(
+                        onPressed: viewModel.isLoading
+                            ? null
+                            : () => viewModel.resetPassword(context),
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          backgroundColor:
+                              const Color.fromARGB(255, 0x29, 0x45, 0x5F),
                         ),
-                        backgroundColor: const Color(0xFF4678A5),
-                      ),
-                      child: viewModel.isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                              'Reset Password',
-                              style: TextStyle(
+                        child: viewModel.isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white)
+                            : const Text(
+                                'Reset Password',
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
-                                  fontWeight: FontWeight.bold),
-                            ),
+                                ),
+                              ),
+                      ),
                     ),
                   ),
                 ],
