@@ -1,15 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:ridehailing/views/widget/maps.dart';
 import 'package:ridehailing/controllers/driver_services.dart';
 import 'package:ridehailing/controllers/profile_main_services.dart';
 import 'package:ridehailing/models/data.dart';
 import 'package:ridehailing/views/profile/profile_view.dart';
-import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:ridehailing/models/localstorage_models.dart';
+import 'package:ridehailing/views/widget/route_item.dart';
+import 'package:ridehailing/controllers/websocket.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -22,14 +20,20 @@ class _MainViewState extends State<MainView> {
   Driver? driver;
   bool isOnline = false;
   final TextEditingController nameController = TextEditingController();
-  WebSocketChannel? channel;
-  Timer? locationUpdateTimer;
+  LatLng? driverPosition;
+  WebSocketService? _webSocketService;
 
   @override
   void initState() {
     super.initState();
     fetchDriverData();
     fetchDriverStatus();
+  }
+
+  @override
+  void dispose() {
+    _disconnectWebSocket();
+    super.dispose();
   }
 
   Future<void> fetchDriverStatus() async {
@@ -41,7 +45,7 @@ class _MainViewState extends State<MainView> {
       });
       _manageWebSocket();
     } catch (e) {
-      print('Error fetching driver status: $e');
+      return;
     }
   }
 
@@ -51,10 +55,13 @@ class _MainViewState extends State<MainView> {
       if (!mounted) return;
       setState(() {
         isOnline = newStatus;
+        if (!isOnline) {
+          driverPosition = null;
+        }
       });
       _manageWebSocket();
     } catch (e) {
-      print('Error updating driver status: $e');
+      return;
     }
   }
 
@@ -66,57 +73,30 @@ class _MainViewState extends State<MainView> {
     }
   }
 
-  Future<void> _connectWebSocket() async {
-    final token = await LocalStorage.getToken();
-    if (token == null) {
-      print('Error: Token not found');
-      return;
-    }
+  void _connectWebSocket() {
+    if (driver == null) return;
 
-    final wsUrl = 'ws://188.166.179.146:8000/api/tracking/ws/location';
-    print('Connecting to WebSocket: $wsUrl');
+    _webSocketService = WebSocketService(
+      onLocationUpdated: (position) {
+        if (!mounted) return; // Periksa apakah widget masih mounted
+        setState(() {
+          driverPosition = position;
+        });
+      },
+      onDisconnected: () {
+        if (!mounted) return; // Periksa apakah widget masih mounted
+        setState(() {
+          driverPosition = null;
+        });
+      },
+    );
 
-    try {
-      channel = IOWebSocketChannel.connect(
-        Uri.parse(wsUrl),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
-
-      channel!.stream.listen((message) {
-        print('Received message: $message');
-      }, onError: (error) {
-        print('WebSocket Error: $error');
-      }, onDone: () {
-        print('WebSocket Connection Closed');
-      });
-
-      _startLocationUpdates();
-    } catch (e) {
-      print('Failed to connect WebSocket: $e');
-    }
+    _webSocketService!.connect(driver!.id);
   }
 
   void _disconnectWebSocket() {
-    locationUpdateTimer?.cancel();
-    channel?.sink.close();
-    channel = null;
-    print('WebSocket disconnected');
-  }
-
-  void _startLocationUpdates() {
-    locationUpdateTimer?.cancel();
-    locationUpdateTimer = Timer.periodic(Duration(seconds: 10), (timer) async {
-      Position position = await Geolocator.getCurrentPosition();
-      final data = {
-        "user_id": driver?.id,
-        "lat": position.latitude,
-        "lng": position.longitude
-      };
-      channel?.sink.add(jsonEncode(data));
-    });
+    _webSocketService?.disconnect();
+    _webSocketService = null;
   }
 
   Future<void> fetchDriverData() async {
@@ -128,7 +108,7 @@ class _MainViewState extends State<MainView> {
         nameController.text = data.name;
       });
     } catch (e) {
-      print('Error fetching driver data: $e');
+      return;
     }
   }
 
@@ -157,16 +137,16 @@ class _MainViewState extends State<MainView> {
                     'Halo👋',
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
                       color: Colors.white,
+                      fontFamily: 'Poppins',
                     ),
                   ),
                   Text(
                     driver?.name ?? '',
                     style: const TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.bold,
                       color: Colors.white,
+                      fontFamily: 'Poppins',
                     ),
                   ),
                 ],
@@ -178,7 +158,7 @@ class _MainViewState extends State<MainView> {
         elevation: 4,
         actions: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(1.0),
             child: ElevatedButton.icon(
               onPressed: toggleOnlineStatus,
               style: ElevatedButton.styleFrom(
@@ -199,9 +179,46 @@ class _MainViewState extends State<MainView> {
           ),
         ],
       ),
-      body: const Column(
+      body: Column(
         children: [
-          Expanded(child: MapScreen()),
+          Expanded(
+            child: MapScreen(
+              driverId: driver?.id,
+              driverPosition: driverPosition,
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(20.0),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: Offset(0, -5),
+                )
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Rute Yang Tersedia:',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                buildRouteItem('JL. R.W. Monginsidi - Zero Point'),
+              ],
+            ),
+          ),
         ],
       ),
     );

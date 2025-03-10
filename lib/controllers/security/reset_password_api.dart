@@ -34,7 +34,6 @@ class ResetPasswordService {
         return {'success': false, 'message': 'Permintaan gagal. Coba lagi.'};
       }
     } catch (e) {
-      print('Error: $e');
       return {'success': false, 'message': 'Terjadi kesalahan pada server.'};
     }
   }

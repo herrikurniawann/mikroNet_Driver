@@ -1,22 +1,76 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:ridehailing/models/localstorage_models.dart';
 
 class WebSocketService {
-  final WebSocketChannel channel =
-      WebSocketChannel.connect(Uri.parse('ws://188.166.179.146:8000/api/tracking/ws/location'));
+  WebSocketChannel? _channel;
+  Timer? _locationUpdateTimer;
+  final Function(LatLng)? onLocationUpdated;
+  final Function()? onDisconnected;
 
-  Stream<LatLng> get driverLocationStream => channel.stream.map((message) {
+  WebSocketService({this.onLocationUpdated, this.onDisconnected});
+
+  Future<void> connect(String driverId) async {
+    final token = await LocalStorage.getToken();
+    if (token == null) {
+      return;
+    }
+
+    const wsUrl = 'ws://188.166.179.146:8000/api/tracking/ws/location';
+
+    try {
+      _channel = IOWebSocketChannel.connect(
+        Uri.parse(wsUrl),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      _channel!.stream.listen((message) {
         final data = jsonDecode(message);
-        return LatLng(data['lat'], data['lng']);
+        if (data['user_id'] == driverId && onLocationUpdated != null) {
+          onLocationUpdated!(LatLng(data['lat'], data['lng']));
+        }
+      }, onError: (error) {
+      }, onDone: () {
+        if (onDisconnected != null) {
+          onDisconnected!();
+        }
       });
 
-  void sendLocation(double lat, double lng) {
-    channel.sink.add(jsonEncode({'lat': lat, 'lng': lng}));
+      _startLocationUpdates(driverId);
+    } catch (e) {
+      return;
+    }
   }
 
-  void close() {
-    channel.sink.close();
+  void disconnect() {
+    _locationUpdateTimer?.cancel();
+    _channel?.sink.close();
+    _channel = null;
+    if (onDisconnected != null) {
+      onDisconnected!();
+    }
   }
+
+  void _startLocationUpdates(String driverId) {
+    _locationUpdateTimer?.cancel();
+    _locationUpdateTimer =
+        Timer.periodic(const Duration(seconds: 10), (timer) async {
+      Position position = await Geolocator.getCurrentPosition();
+      final data = {
+        "user_id": driverId,
+        "lat": position.latitude,
+        "lng": position.longitude
+      };
+      _channel?.sink.add(jsonEncode(data));
+    });
+  }
+
+  void dispose() => disconnect();
 }
