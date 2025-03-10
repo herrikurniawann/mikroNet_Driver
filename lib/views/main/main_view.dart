@@ -2,12 +2,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:ridehailing/views/widget/maps.dart';
-import 'package:ridehailing/controllers/driver_services.dart';
-import 'package:ridehailing/controllers/profile_main_services.dart';
-import 'package:ridehailing/models/data.dart';
-import 'package:ridehailing/views/profile/profile_view.dart';
+import 'package:ridehailing/controllers/main/driver_services.dart';
+import 'package:ridehailing/controllers/main/profile_main_services.dart';
+import 'package:ridehailing/models/main/data.dart';
+import 'package:ridehailing/views/main/profile_view.dart';
 import 'package:ridehailing/views/widget/route_item.dart';
-import 'package:ridehailing/controllers/websocket.dart';
+import 'package:ridehailing/controllers/main/websocket.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});

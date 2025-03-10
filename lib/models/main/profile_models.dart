@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ridehailing/controllers/profile_main_services.dart';
-import 'package:ridehailing/models/data.dart';
+import 'package:ridehailing/controllers/main/profile_main_services.dart';
+import 'package:ridehailing/models/main/data.dart';
 
 class ProfileState {
   final Driver? driver;

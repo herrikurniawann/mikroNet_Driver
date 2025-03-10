@@ -4,7 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:ridehailing/models/localstorage_models.dart';
+import 'package:ridehailing/models/main/localstorage_models.dart';
 
 class WebSocketService {
   WebSocketChannel? _channel;

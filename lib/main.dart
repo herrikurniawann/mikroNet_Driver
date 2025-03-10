@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ridehailing/models/auth/register_models.dart';
-import 'package:ridehailing/models/profile_models.dart';
+import 'package:ridehailing/models/main/profile_models.dart';
 import 'package:ridehailing/views/auth/login_view.dart';
 import 'package:ridehailing/models/auth/login_models.dart';
 import 'package:ridehailing/views/main/main_view.dart';

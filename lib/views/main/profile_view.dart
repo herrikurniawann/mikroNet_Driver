@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:ridehailing/views/widget/logout_button.dart';
 import 'package:ridehailing/views/security/change_password_view.dart';
 import 'package:ridehailing/views/widget/form_label.dart';
-import 'package:ridehailing/models/profile_models.dart';
+import 'package:ridehailing/models/main/profile_models.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});

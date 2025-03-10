@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ridehailing/models/localstorage_models.dart';
+import 'package:ridehailing/models/main/localstorage_models.dart';
 import 'package:ridehailing/views/main/main_view.dart';
 import 'package:ridehailing/controllers/auth/login_api.dart';
 

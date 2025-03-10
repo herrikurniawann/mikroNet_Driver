@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:ridehailing/models/localstorage_models.dart';
-import 'package:ridehailing/models/data.dart';
+import 'package:ridehailing/models/main/localstorage_models.dart';
+import 'package:ridehailing/models/main/data.dart';
 
 class ApiService {
   static const String baseUrl = 'http://188.166.179.146:8000/api';
