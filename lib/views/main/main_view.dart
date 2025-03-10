@@ -78,13 +78,13 @@ class _MainViewState extends State<MainView> {
 
     _webSocketService = WebSocketService(
       onLocationUpdated: (position) {
-        if (!mounted) return; // Periksa apakah widget masih mounted
+        if (!mounted) return;
         setState(() {
           driverPosition = position;
         });
       },
       onDisconnected: () {
-        if (!mounted) return; // Periksa apakah widget masih mounted
+        if (!mounted) return;
         setState(() {
           driverPosition = null;
         });
@@ -127,7 +127,15 @@ class _MainViewState extends State<MainView> {
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundImage: NetworkImage(driver?.profilePictureUrl ?? ''),
+                backgroundImage: driver?.profilePictureUrl != null &&
+                        driver!.profilePictureUrl.isNotEmpty
+                    ? NetworkImage(driver!.profilePictureUrl)
+                    : const AssetImage('assets/images/default_profile.png')
+                        as ImageProvider,
+                child: driver?.profilePictureUrl == null ||
+                        driver!.profilePictureUrl.isEmpty
+                    ? const Icon(Icons.person, color: Colors.white)
+                    : null,
               ),
               const SizedBox(width: 8),
               Column(

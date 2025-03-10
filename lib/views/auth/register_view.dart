@@ -20,7 +20,7 @@ class _RegisterPageState extends State<RegisterPage> {
       child: Consumer<RegisterViewModel>(
         builder: (context, model, child) {
           return Scaffold(
-            resizeToAvoidBottomInset: true,
+            resizeToAvoidBottomInset: false,
             body: Stack(
               children: [
                 const WaveBackground(height: 200),

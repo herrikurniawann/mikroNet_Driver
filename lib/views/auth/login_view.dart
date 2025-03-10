@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Consumer<LoginViewModel>(
         builder: (context, loginViewModel, _) {
           return Scaffold(
-            resizeToAvoidBottomInset: true,
+            resizeToAvoidBottomInset: false,
             body: Stack(
               children: [
                 const WaveBackground(height: 250),
@@ -49,114 +49,111 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 80),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: Form(
-                          child: Column(
-                            children: <Widget>[
-                              AuthFormFields.buildTextField(
-                                controller: loginViewModel.emailController,
-                                label: 'Email',
-                                icon: Icons.email,
-                              ),
-                              AuthFormFields.buildPasswordField(
-                                controller: loginViewModel.passwordController,
-                                label: 'Password',
-                                isObscure: loginViewModel.isObscure,
-                                onToggleObscure: () {
-                                  loginViewModel.toggleObscure();
-                                },
-                              ),
-                              SizedBox(
-                                width: 300,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const ResetPasswordView(),
-                                          ),
-                                        );
-                                      },
-                                      child: const Text(
-                                        'Lupa Password',
-                                        style: TextStyle(
-                                            fontFamily: 'Poppins',
-                                            color: Colors.black),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 300,
-                                height: 60,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: ElevatedButton(
-                                    onPressed: loginViewModel.isLoading
-                                        ? null
-                                        : () => loginViewModel.login(context),
-                                    style: ElevatedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      backgroundColor: const Color.fromARGB(
-                                          255, 0x29, 0x45, 0x5F),
-                                    ),
-                                    child: loginViewModel.isLoading
-                                        ? const CircularProgressIndicator()
-                                        : const Text(
-                                            'Masuk',
-                                            style: TextStyle(
-                                              fontFamily: 'Poppins',
-                                              color: Colors.white,
-                                              fontSize: 18.0,
-                                            ),
-                                          ),
-                                  ),
-                                ),
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Text(
-                                    'Belum punya akun?',
-                                    style: TextStyle(
-                                        fontFamily: 'Poppins',
-                                        color: Color.fromARGB(
-                                            255, 0x29, 0x45, 0x5F),
-                                        fontSize: 14.0),
-                                  ),
-                                  TextButton(
+                        child: Column(
+                          children: <Widget>[
+                            AuthFormFields.buildTextField(
+                              controller: loginViewModel.emailController,
+                              label: 'Email',
+                              icon: Icons.email,
+                            ),
+                            AuthFormFields.buildPasswordField(
+                              controller: loginViewModel.passwordController,
+                              label: 'Password',
+                              isObscure: loginViewModel.isObscure,
+                              onToggleObscure: () {
+                                loginViewModel.toggleObscure();
+                              },
+                            ),
+                            SizedBox(
+                              width: 300,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: TextButton(
                                     onPressed: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                const RegisterPage()),
+                                          builder: (context) =>
+                                              const ResetPasswordView(),
+                                        ),
                                       );
                                     },
                                     child: const Text(
-                                      'Daftar Sekarang',
+                                      'Lupa Password',
                                       style: TextStyle(
-                                        fontFamily: 'Poppins',
-                                        color: Color.fromARGB(
-                                            255, 0x29, 0x45, 0x5F),
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.bold,
-                                        fontStyle: FontStyle.italic,
-                                      ),
+                                          fontFamily: 'Poppins',
+                                          color: Colors.black),
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(
+                              width: 300,
+                              height: 60,
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: ElevatedButton(
+                                  onPressed: loginViewModel.isLoading
+                                      ? null
+                                      : () => loginViewModel.login(context),
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    backgroundColor: const Color.fromARGB(
+                                        255, 0x29, 0x45, 0x5F),
+                                  ),
+                                  child: loginViewModel.isLoading
+                                      ? const CircularProgressIndicator()
+                                      : const Text(
+                                          'Masuk',
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins',
+                                            color: Colors.white,
+                                            fontSize: 18.0,
+                                          ),
+                                        ),
+                                ),
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'Belum punya akun?',
+                                  style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      color:
+                                          Color.fromARGB(255, 0x29, 0x45, 0x5F),
+                                      fontSize: 14.0),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const RegisterPage()),
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Daftar Sekarang',
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      color:
+                                          Color.fromARGB(255, 0x29, 0x45, 0x5F),
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.bold,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ],

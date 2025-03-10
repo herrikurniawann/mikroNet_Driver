@@ -14,8 +14,10 @@ class ResetPasswordView extends StatelessWidget {
       child: Consumer<ResetPasswordViewModel>(
         builder: (context, viewModel, child) {
           return Scaffold(
+            resizeToAvoidBottomInset: false,
             backgroundColor: Colors.white,
             appBar: AppBar(
+              backgroundColor: Colors.white,
               title: SvgPicture.asset(
                 'assets/svg/logo_ride.svg',
                 height: 40,

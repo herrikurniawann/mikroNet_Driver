@@ -60,7 +60,7 @@ class _MapScreenState extends State<MapScreen> {
             subdomains: const ['a', 'b', 'c', 'd'],
           ),
           if (routePoints
-              .isNotEmpty) // Tampilkan rute jika routePoints tidak kosong
+              .isNotEmpty)
             PolylineLayer(
               polylines: [
                 Polyline(
@@ -71,7 +71,7 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
           if (widget.driverPosition !=
-              null) // Tampilkan ikon SVG jika driverPosition tidak null
+              null)
             MarkerLayer(
               markers: [
                 Marker(

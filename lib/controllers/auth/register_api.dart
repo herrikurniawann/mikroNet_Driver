@@ -25,13 +25,9 @@ class AuthService {
     try {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
-      
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-      
+
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
-      print('Error: $e');
       return false;
     }
   }

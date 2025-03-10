@@ -65,16 +65,14 @@ class ProfileViewModel extends ChangeNotifier {
       };
       await ApiService.updateDriver(updatedData);
 
-      // Fetch data terbaru setelah update
       await fetchDriverData();
 
-      // Keluar dari mode edit
       _state = _state.copyWith(isEditing: false);
       notifyListeners();
 
-      return true; // Berhasil
+      return true;
     } catch (e) {
-      return false; // Gagal
+      return false;
     }
   }
 

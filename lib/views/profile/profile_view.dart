@@ -13,7 +13,6 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  // Definisikan scaffoldMessengerKey di tingkat state
   final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
   @override

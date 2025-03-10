@@ -14,8 +14,10 @@ class ChangePasswordView extends StatelessWidget {
       child: Consumer<ChangePasswordViewModel>(
         builder: (context, viewModel, child) {
           return Scaffold(
+            resizeToAvoidBottomInset: false,
             backgroundColor: Colors.white,
             appBar: AppBar(
+              backgroundColor: Colors.white,
               title: SvgPicture.asset(
                 'assets/svg/logo_ride.svg',
                 height: 40,
