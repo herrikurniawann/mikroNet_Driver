@@ -12,7 +12,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
-        ChangeNotifierProvider(create: (_) => RegisterViewModel()),
+        ChangeNotifierProvider(create: (_) => RegisterViewModel()), 
         ChangeNotifierProvider(create: (_) => ProfileViewModel()),
       ],
       child: const MainApp(),
