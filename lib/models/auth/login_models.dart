@@ -69,7 +69,6 @@ class LoginViewModel extends ChangeNotifier {
           ),
         );
 
-        // 🔹 Navigasi ke halaman utama
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const MainView()),

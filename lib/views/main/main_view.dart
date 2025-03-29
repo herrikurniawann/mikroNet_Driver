@@ -8,6 +8,7 @@ import 'package:ridehailing/models/main/data.dart';
 import 'package:ridehailing/views/main/profile_view.dart';
 import 'package:ridehailing/views/widget/route_item.dart';
 import 'package:ridehailing/controllers/main/websocket.dart';
+import 'package:ridehailing/controllers/auth/auth_checker.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -26,6 +27,7 @@ class _MainViewState extends State<MainView> {
   @override
   void initState() {
     super.initState();
+    AuthChecker.checkLoginStatus(context);
     fetchDriverData();
     fetchDriverStatus();
   }
