@@ -45,6 +45,7 @@ dependencies:
   web_socket_channel: ^3.0.2
   flutter_svg: ^2.0.17
   geolocator: ^13.0.2
+  lottie: ^3.3.1
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +73,7 @@ flutter:
   assets:
     - assets/images/
     - assets/svg/
+    - assets/animations/
     
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

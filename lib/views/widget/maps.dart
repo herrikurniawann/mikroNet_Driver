@@ -25,8 +25,12 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> fetchRoute() async {
+    const startPoint = '124.806202431662,1.4576477649812942';
+    const point1 = '124.83959056958739,1.463911368970314';
+    const point2 = '124.82742214408177,1.4632790075271764';
+
     const url =
-        'http://router.project-osrm.org/route/v1/driving/124.8104,1.4638;124.8421,1.4748?geometries=geojson';
+        'http://router.project-osrm.org/route/v1/driving/$startPoint;$point1;$point2;$startPoint?geometries=geojson';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -59,24 +63,22 @@ class _MapScreenState extends State<MapScreen> {
                 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
             subdomains: const ['a', 'b', 'c', 'd'],
           ),
-          if (routePoints
-              .isNotEmpty)
+          if (routePoints.isNotEmpty)
             PolylineLayer(
               polylines: [
                 Polyline(
                   points: routePoints,
                   color: Colors.blue,
-                  strokeWidth: 5.0,
+                  strokeWidth: 3.0,
                 ),
               ],
             ),
-          if (widget.driverPosition !=
-              null)
+          if (widget.driverPosition != null)
             MarkerLayer(
               markers: [
                 Marker(
-                  width: 80.0,
-                  height: 80.0,
+                  width: 40.0,
+                  height: 40.0,
                   point: widget.driverPosition!,
                   child: Container(
                     width: 20,
@@ -91,6 +93,19 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ],
             ),
+          const MarkerLayer(
+            markers: [
+              Marker(
+                  point: LatLng(1.4576477649812942, 124.806202431662),
+                  child: Icon(Icons.place_sharp, color: Colors.black)),
+              Marker(
+                  point: LatLng(1.463911368970314, 124.83959056958739),
+                  child: SizedBox()),
+              Marker(
+                  point: LatLng(1.4632790075271764, 124.82742214408177),
+                  child: SizedBox()),
+            ],
+          ),
         ],
       ),
     );

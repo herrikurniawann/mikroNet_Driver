@@ -8,7 +8,6 @@ import 'package:ridehailing/models/main/data.dart';
 import 'package:ridehailing/views/main/profile_view.dart';
 import 'package:ridehailing/views/widget/route_item.dart';
 import 'package:ridehailing/controllers/main/websocket.dart';
-import 'package:ridehailing/controllers/auth/auth_checker.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -27,7 +26,6 @@ class _MainViewState extends State<MainView> {
   @override
   void initState() {
     super.initState();
-    AuthChecker.checkLoginStatus(context);
     fetchDriverData();
     fetchDriverStatus();
   }
@@ -75,8 +73,15 @@ class _MainViewState extends State<MainView> {
     }
   }
 
-  void _connectWebSocket() {
+  Future<void> _connectWebSocket() async {
     if (driver == null) return;
+
+    LatLng? lastPosition = await _webSocketService?.getCachedDriverLocation();
+    if (lastPosition != null) {
+      setState(() {
+        driverPosition = lastPosition;
+      });
+    }
 
     _webSocketService = WebSocketService(
       onLocationUpdated: (position) {
@@ -132,7 +137,7 @@ class _MainViewState extends State<MainView> {
                 backgroundImage: driver?.profilePictureUrl != null &&
                         driver!.profilePictureUrl.isNotEmpty
                     ? NetworkImage(driver!.profilePictureUrl)
-                    : const AssetImage('assets/images/default_profile.png')
+                    : const AssetImage('assets/images/default.jpg')
                         as ImageProvider,
                 child: driver?.profilePictureUrl == null ||
                         driver!.profilePictureUrl.isEmpty
@@ -164,7 +169,7 @@ class _MainViewState extends State<MainView> {
             ],
           ),
         ),
-        backgroundColor: const Color(0xFF4678A5),
+        backgroundColor: const Color.fromARGB(255, 0x29, 0x45, 0x5F),
         elevation: 4,
         actions: [
           Padding(
@@ -225,7 +230,19 @@ class _MainViewState extends State<MainView> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                buildRouteItem('JL. R.W. Monginsidi - Zero Point'),
+                SizedBox(
+                  height: 100,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        buildRouteItem('JL. R.W. Monginsidi - Zero Point'),
+                        buildRouteItem('Zero Point - Jl. Sam Ratulangi'),
+                        buildRouteItem(
+                            'Jl. Sam Ratulangi - Jl. R.W Monginsidi'),
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
           ),
