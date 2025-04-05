@@ -173,23 +173,29 @@ class _MainViewState extends State<MainView> {
         elevation: 4,
         actions: [
           Padding(
-            padding: const EdgeInsets.all(1.0),
-            child: ElevatedButton.icon(
-              onPressed: toggleOnlineStatus,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isOnline ? Colors.green : Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+            padding: const EdgeInsets.all(5.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: toggleOnlineStatus,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isOnline ? Colors.green : Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
+                  ),
+                  icon: Icon(
+                      isOnline ? Icons.check_circle : Icons.remove_circle,
+                      color: Colors.white),
+                  label: Text(
+                    isOnline ? 'Online' : 'Offline',
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              ),
-              icon: Icon(isOnline ? Icons.check_circle : Icons.remove_circle,
-                  color: Colors.white),
-              label: Text(
-                isOnline ? 'Online' : 'Offline',
-                style: const TextStyle(color: Colors.white, fontSize: 16),
-              ),
+              ],
             ),
           ),
         ],

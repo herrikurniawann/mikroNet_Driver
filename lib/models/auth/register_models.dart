@@ -61,7 +61,7 @@ class RegisterViewModel extends ChangeNotifier {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Daftar Berhasil Silahkan Login'),
+          content: Text('Daftar Berhasil Silahkan Menunggu Validasi!'),
           backgroundColor: Colors.green,
         ),
       );
