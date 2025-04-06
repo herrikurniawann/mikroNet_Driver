@@ -46,6 +46,7 @@ dependencies:
   flutter_svg: ^2.0.17
   geolocator: ^13.0.2
   lottie: ^3.3.1
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:

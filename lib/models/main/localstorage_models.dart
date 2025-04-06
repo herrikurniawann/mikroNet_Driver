@@ -1,22 +1,41 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
+  static const String tokenKey = 'auth_token';
+  static const String emailKey = 'user_email';
+
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('access_token', token);
+    await prefs.setString(tokenKey, token);
   }
 
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('access_token');
-    return token;
+    return prefs.getString(tokenKey);
   }
 
-  static Future<void> clearToken() async {
+  static Future<void> removeToken() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('access_token');
-    await prefs.setBool('isLoggedIn', false);
+    await prefs.remove(tokenKey);
   }
 
-  static getLoginTimestamp() {}
+  static Future<void> saveEmail(String email) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(emailKey, email);
+  }
+
+  static Future<String?> getEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(emailKey);
+  }
+
+  static Future<void> removeEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(emailKey);
+  }
+
+  static Future<void> clearAll() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+  }
 }

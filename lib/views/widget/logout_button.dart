@@ -11,7 +11,7 @@ class LogoutButton extends StatelessWidget {
       width: 170,
       child: ElevatedButton(
         onPressed: () async {
-          await LocalStorage.clearToken();
+          await LocalStorage.removeToken();
           if (context.mounted) {
             Navigator.pushAndRemoveUntil(
               context,

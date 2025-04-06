@@ -7,25 +7,33 @@ class AuthService {
   Future<bool> registerDriver({
     required String name,
     required String email,
+    required String phoneNumber,
+    required String licenseNumber,
+    required String sim,
     required String password,
     required String passwordConfirmation,
     required File profileImage,
+    required File ktpImage,
   }) async {
     final url = Uri.parse('$_baseUrl/register/driver');
     final request = http.MultipartRequest('POST', url);
 
     request.fields['name'] = name;
     request.fields['email'] = email;
+    request.fields['phone_number'] = phoneNumber;
+    request.fields['license_number'] = licenseNumber;
+    request.fields['sim'] = sim;
     request.fields['password'] = password;
     request.fields['password_confirmation'] = passwordConfirmation;
-    request.files.add(
-      await http.MultipartFile.fromPath('profile_picture', profileImage.path),
-    );
+
+    request.files.add(await http.MultipartFile.fromPath(
+        'profile_picture', profileImage.path));
+    request.files
+        .add(await http.MultipartFile.fromPath('ktp', ktpImage.path));
 
     try {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
-
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
       return false;

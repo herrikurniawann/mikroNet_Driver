@@ -5,6 +5,8 @@ class AuthFormFields {
     required TextEditingController controller,
     required String label,
     required IconData icon,
+    String? Function(String?)? validator,
+    TextInputType keyboardType = TextInputType.text,
     bool isPassword = false,
     bool isObscure = true,
     VoidCallback? onToggleObscure,
@@ -16,6 +18,8 @@ class AuthFormFields {
         child: TextFormField(
           controller: controller,
           obscureText: isPassword ? isObscure : false,
+          keyboardType: keyboardType,
+          validator: validator,
           decoration: InputDecoration(
             labelText: label,
             filled: true,
@@ -30,6 +34,7 @@ class AuthFormFields {
             fillColor: Colors.white,
             border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
+            errorMaxLines: 2,
           ),
         ),
       ),
@@ -41,11 +46,13 @@ class AuthFormFields {
     required String label,
     required bool isObscure,
     required VoidCallback onToggleObscure,
+    String? Function(String?)? validator,
   }) {
     return buildTextField(
       controller: controller,
       label: label,
       icon: Icons.lock,
+      validator: validator,
       isPassword: true,
       isObscure: isObscure,
       onToggleObscure: onToggleObscure,
