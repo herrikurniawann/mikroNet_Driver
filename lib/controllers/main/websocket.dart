@@ -12,6 +12,10 @@ class WebSocketService {
   Timer? _locationUpdateTimer;
   final Function(LatLng)? onLocationUpdated;
   final Function()? onDisconnected;
+  Position? _lastPosition;
+
+  // Define minimum distance threshold (in meters)
+  final double _minDistance = 10.0;
 
   WebSocketService({this.onLocationUpdated, this.onDisconnected});
 
@@ -21,9 +25,17 @@ class WebSocketService {
       return;
     }
 
+    // Use the original URL from your code
     const wsUrl = 'ws://188.166.179.146:8000/api/tracking/ws/location';
 
     try {
+      // Load last known position from cache
+      LatLng? cachedLocation = await getCachedDriverLocation();
+      if (cachedLocation != null && onLocationUpdated != null) {
+        onLocationUpdated!(cachedLocation);
+      }
+
+      // More basic connection without extra parameters that might cause issues
       _channel = IOWebSocketChannel.connect(
         Uri.parse(wsUrl),
         headers: {
@@ -32,16 +44,29 @@ class WebSocketService {
         },
       );
 
-      _channel!.stream.listen((message) {
-        final data = jsonDecode(message);
-        if (data['user_id'] == driverId && onLocationUpdated != null) {
-          onLocationUpdated!(LatLng(data['lat'], data['lng']));
-        }
-      }, onError: (error) {}, onDone: () {
-        if (onDisconnected != null) {
-          onDisconnected!();
-        }
-      });
+      _channel!.stream.listen(
+        (message) {
+          try {
+            final data = jsonDecode(message);
+            if (data['user_id'] == driverId && onLocationUpdated != null) {
+              final location = LatLng(data['lat'], data['lng']);
+              onLocationUpdated!(location);
+            }
+          } catch (e) {
+            return;
+          }
+        },
+        onError: (error) {
+          if (onDisconnected != null) {
+            onDisconnected!();
+          }
+        },
+        onDone: () {
+          if (onDisconnected != null) {
+            onDisconnected!();
+          }
+        },
+      );
 
       _startLocationUpdates(driverId);
     } catch (e) {
@@ -51,8 +76,17 @@ class WebSocketService {
 
   void disconnect() {
     _locationUpdateTimer?.cancel();
-    _channel?.sink.close();
-    _channel = null;
+    _locationUpdateTimer = null;
+
+    if (_channel != null) {
+      try {
+        _channel!.sink.close();
+      } catch (e) {
+        return;
+      }
+      _channel = null;
+    }
+
     if (onDisconnected != null) {
       onDisconnected!();
     }
@@ -60,47 +94,88 @@ class WebSocketService {
 
   void _startLocationUpdates(String driverId) {
     _locationUpdateTimer?.cancel();
-    _locationUpdateTimer =
-        Timer.periodic(const Duration(seconds: 5), (timer) async {
-      Position position = await Geolocator.getCurrentPosition();
-      int interval = _getAdaptiveInterval(position.speed);
 
-      _locationUpdateTimer?.cancel();
-      _locationUpdateTimer =
-          Timer.periodic(Duration(seconds: interval), (timer) async {
-        Position newPosition = await Geolocator.getCurrentPosition();
-        final data = {
-          "user_id": driverId,
-          "lat": newPosition.latitude,
-          "lng": newPosition.longitude
-        };
+    // Use a simple approach first to reduce complexity
+    _locationUpdateTimer = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) async {
+        try {
+          // Menggunakan LocationSettings sebagai pengganti desiredAccuracy
+          const locationSettings = LocationSettings(
+            accuracy: LocationAccuracy.high,
+            distanceFilter: 0,
+          );
+          
+          Position position = await Geolocator.getCurrentPosition(
+            locationSettings: locationSettings,
+          );
 
-        // Simpan lokasi ke cache
-        _cacheDriverLocation(newPosition.latitude, newPosition.longitude);
+          // Check if position changed significantly
+          bool shouldSend = true;
+          if (_lastPosition != null) {
+            double distance = Geolocator.distanceBetween(
+              _lastPosition!.latitude,
+              _lastPosition!.longitude,
+              position.latitude,
+              position.longitude,
+            );
 
-        _channel?.sink.add(jsonEncode(data));
-      });
-    });
-  }
+            // Only send if moved more than minimum distance
+            shouldSend = distance >= _minDistance;
+          }
 
-  int _getAdaptiveInterval(double speed) {
-    if (speed < 5) return 10;
-    if (speed < 20) return 5;
-    return 3;
+          if (shouldSend) {
+            _lastPosition = position;
+
+            final data = {
+              "user_id": driverId,
+              "lat": position.latitude,
+              "lng": position.longitude
+            };
+
+            // Cache location
+            _cacheDriverLocation(position.latitude, position.longitude);
+
+            // Send to server if connected
+            if (_channel != null) {
+              _channel!.sink.add(jsonEncode(data));
+            }
+
+            // Update UI
+            if (onLocationUpdated != null) {
+              onLocationUpdated!(LatLng(position.latitude, position.longitude));
+            }
+          }
+        } catch (e) {
+          return;
+        }
+      },
+    );
   }
 
   Future<void> _cacheDriverLocation(double lat, double lng) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('driver_lat', lat);
-    await prefs.setDouble('driver_lng', lng);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble('driver_lat', lat);
+      await prefs.setDouble('driver_lng', lng);
+      await prefs.setInt(
+          'driver_location_timestamp', DateTime.now().millisecondsSinceEpoch);
+    } catch (e) {
+      return;
+    }
   }
 
   Future<LatLng?> getCachedDriverLocation() async {
-    final prefs = await SharedPreferences.getInstance();
-    final lat = prefs.getDouble('driver_lat');
-    final lng = prefs.getDouble('driver_lng');
-    if (lat != null && lng != null) {
-      return LatLng(lat, lng);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lat = prefs.getDouble('driver_lat');
+      final lng = prefs.getDouble('driver_lng');
+
+      if (lat != null && lng != null) {
+        return LatLng(lat, lng);
+      }
+    } catch (e) {
+      return null;
     }
     return null;
   }
