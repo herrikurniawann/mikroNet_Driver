@@ -335,7 +335,7 @@ class _MainViewState extends State<MainView>
                                     const SizedBox(width: 12),
                                     const Expanded(
                                       child: Text(
-                                        'Anda sedang online dan siap menerima penumpang',
+                                        'Anda sedang online',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 14,

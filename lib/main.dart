@@ -32,7 +32,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: 'ridehailingdriver',
       theme: ThemeData(visualDensity: VisualDensity.adaptivePlatformDensity),
-      debugShowCheckedModeBanner: true,
+      debugShowCheckedModeBanner: false,
       home: FutureBuilder<bool>(
         future: loginViewModel.checkLoginStatus(),
         builder: (context, snapshot) {

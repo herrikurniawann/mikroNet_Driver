@@ -219,21 +219,6 @@ class _LoginPageState extends State<LoginPage>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Remember me checkbox
-          Row(
-            children: [
-              Checkbox(
-                value: viewModel.rememberMe,
-                onChanged: (_) => viewModel.toggleRememberMe(),
-                activeColor: const Color(0xFF29455F),
-              ),
-              const Text(
-                'Ingat Saya',
-                style: TextStyle(fontSize: 14),
-              ),
-            ],
-          ),
-
           // Forgot password link
           TextButton(
             onPressed: () {

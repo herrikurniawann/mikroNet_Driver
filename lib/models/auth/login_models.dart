@@ -11,7 +11,6 @@ class LoginViewModel extends ChangeNotifier {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isObscure = true;
-  bool _rememberMe = false;
   String? _emailError;
   String? _passwordError;
   
@@ -19,7 +18,6 @@ class LoginViewModel extends ChangeNotifier {
   TextEditingController get emailController => _emailController;
   TextEditingController get passwordController => _passwordController;
   bool get isObscure => _isObscure;
-  bool get rememberMe => _rememberMe;
   String? get emailError => _emailError;
   String? get passwordError => _passwordError;
   
@@ -33,10 +31,6 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
   }
   
-  void toggleRememberMe() {
-    _rememberMe = !_rememberMe;
-    notifyListeners();
-  }
   
   // Validasi untuk email
   String? validateEmail(String? value) {
@@ -130,13 +124,6 @@ class LoginViewModel extends ChangeNotifier {
         // Simpan token
         await LocalStorage.saveToken(token);
         
-        // Simpan email jika "remember me" diaktifkan
-        if (_rememberMe) {
-          await LocalStorage.saveEmail(email);
-        } else {
-          await LocalStorage.removeEmail();
-        }
-        
         if (!context.mounted) return;
         
         // Navigasi ke halaman utama
@@ -175,14 +162,6 @@ class LoginViewModel extends ChangeNotifier {
         MaterialPageRoute(builder: (context) => const MainView()),
         (Route<dynamic> route) => false,
       );
-    }
-    
-    // Isi email dari Remember Me jika ada
-    String? savedEmail = await LocalStorage.getEmail();
-    if (savedEmail != null && savedEmail.isNotEmpty) {
-      _emailController.text = savedEmail;
-      _rememberMe = true;
-      notifyListeners();
     }
   }
   
