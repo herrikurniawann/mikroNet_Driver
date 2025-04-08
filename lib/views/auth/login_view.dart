@@ -22,7 +22,6 @@ class _LoginPageState extends State<LoginPage>
   void initState() {
     super.initState();
 
-    // Inisialisasi animasi
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
@@ -36,12 +35,6 @@ class _LoginPageState extends State<LoginPage>
     );
 
     _animationController.forward();
-
-    // Periksa status login
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final loginViewModel = context.read<LoginViewModel>();
-      loginViewModel.checkLoginStatusAndNavigate(context);
-    });
   }
 
   @override
@@ -52,98 +45,79 @@ class _LoginPageState extends State<LoginPage>
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
+    // Buat ChangeNotifierProvider lokal untuk halaman ini
     return ChangeNotifierProvider(
       create: (_) => LoginViewModel(),
-      child: Consumer<LoginViewModel>(
-        builder: (context, loginViewModel, _) {
-          return Stack(
-            children: [
-              Scaffold(
-                resizeToAvoidBottomInset: true,
-                body: Stack(
-                  children: [
-                    // Wave background
-                    const WaveBackground(height: 250),
+      child: Consumer<LoginViewModel>(builder: (context, loginViewModel, _) {
+        // Pindahkan checkLoginStatusAndNavigate ke sini
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          loginViewModel.checkLoginStatusAndNavigate(context);
+        });
 
-                    // Main content with Form
-                    SingleChildScrollView(
-                      physics: const ClampingScrollPhysics(),
-                      child: Column(
-                        children: [
-                          // Logo section with animation
-                          FadeTransition(
-                            opacity: _fadeAnimation,
-                            child: SizedBox(
-                              height: 250,
-                              child: Center(
-                                child: Hero(
-                                  tag: 'app_logo',
-                                  child: Image.asset(
-                                    'assets/images/logo.png',
-                                    width: 250,
-                                  ),
+        final screenSize = MediaQuery.of(context).size;
+
+        return Stack(
+          children: [
+            Scaffold(
+              resizeToAvoidBottomInset: true,
+              body: Stack(
+                children: [
+                  const WaveBackground(height: 250),
+                  SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    child: Column(
+                      children: [
+                        FadeTransition(
+                          opacity: _fadeAnimation,
+                          child: SizedBox(
+                            height: 250,
+                            child: Center(
+                              child: Hero(
+                                tag: 'app_logo',
+                                child: Image.asset(
+                                  'assets/images/logo.png',
+                                  width: 250,
                                 ),
                               ),
                             ),
                           ),
-
-                          // Form section
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 16),
-                            width: screenSize.width,
-                            child: Form(
-                              key: loginViewModel.formKey,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  // Title
-                                  const SizedBox(height: 24),
-
-                                  // Email field
-                                  buildEmailField(loginViewModel),
-
-                                  const SizedBox(height: 16),
-
-                                  // Password field
-                                  buildPasswordField(loginViewModel),
-
-                                  // Remember me checkbox and Forget password link
-                                  buildRememberMeAndForgotPassword(
-                                      context, loginViewModel),
-
-                                  const SizedBox(height: 24),
-
-                                  // Login button
-                                  buildLoginButton(loginViewModel),
-
-                                  const SizedBox(height: 24),
-
-                                  // Register link
-                                  buildRegisterLink(context),
-
-                                  const SizedBox(height: 32),
-                                ],
-                              ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 16),
+                          width: screenSize.width,
+                          child: Form(
+                            key: loginViewModel.formKey,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(height: 24),
+                                buildEmailField(loginViewModel),
+                                const SizedBox(height: 16),
+                                buildPasswordField(loginViewModel),
+                                buildRememberMeAndForgotPassword(
+                                    context, loginViewModel),
+                                const SizedBox(height: 24),
+                                buildLoginButton(loginViewModel, context),
+                                const SizedBox(height: 24),
+                                buildRegisterLink(context),
+                                const SizedBox(height: 32),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-
-              // Loading overlay
-              if (loginViewModel.isLoading) buildLoadingOverlay(),
-            ],
-          );
-        },
-      ),
+            ),
+            if (loginViewModel.isLoading) buildLoadingOverlay(),
+          ],
+        );
+      }),
     );
   }
 
@@ -177,6 +151,8 @@ class _LoginPageState extends State<LoginPage>
   }
 
   Widget buildPasswordField(LoginViewModel viewModel) {
+    // Gunakan Consumer khusus untuk bagian Password saja
+    // agar hanya bagian ini yang di-rebuild saat isObscure berubah
     return TextFormField(
       controller: viewModel.passwordController,
       validator: viewModel.validatePassword,
@@ -185,12 +161,21 @@ class _LoginPageState extends State<LoginPage>
         labelText: 'Password',
         hintText: 'Masukkan password',
         prefixIcon: const Icon(Icons.lock, color: Color(0xFF29455F)),
-        suffixIcon: IconButton(
-          icon: Icon(
-            viewModel.isObscure ? Icons.visibility : Icons.visibility_off,
-            color: const Color(0xFF29455F),
+        suffixIcon: Material(
+          color: Colors.transparent,
+          child: IconButton(
+            icon: Icon(
+              viewModel.isObscure
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
+              color: const Color(0xFF29455F),
+              size: 22,
+            ),
+            splashRadius: 20,
+            onPressed: () {
+              viewModel.toggleObscure();
+            },
           ),
-          onPressed: viewModel.toggleObscure,
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         enabledBorder: OutlineInputBorder(
@@ -219,7 +204,6 @@ class _LoginPageState extends State<LoginPage>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Forgot password link
           TextButton(
             onPressed: () {
               Navigator.push(
@@ -242,7 +226,7 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  Widget buildLoginButton(LoginViewModel viewModel) {
+  Widget buildLoginButton(LoginViewModel viewModel, BuildContext context) {
     return ElevatedButton(
       onPressed: viewModel.isLoading ? null : () => viewModel.login(context),
       style: ElevatedButton.styleFrom(
@@ -300,7 +284,7 @@ class _LoginPageState extends State<LoginPage>
   Widget buildLoadingOverlay() {
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withValues(alpha: 0.6),
+        color: Colors.black.withAlpha(150),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,

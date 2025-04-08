@@ -84,24 +84,24 @@ class ChangePasswordView extends StatelessWidget {
                         controller: viewModel.oldPasswordController,
                         label: 'Password Lama',
                         hint: 'Masukkan password lama Anda',
-                        isObscure: viewModel.isObscure,
-                        onToggleObscure: viewModel.toggleObscure,
+                        isObscure: viewModel.isOldPasswordObscure,
+                        onToggleObscure: viewModel.toggleOldPasswordObscure,
                       ),
                       const SizedBox(height: 16),
                       _buildPasswordField(
                         controller: viewModel.newPasswordController,
                         label: 'Password Baru',
                         hint: 'Masukkan password baru',
-                        isObscure: viewModel.isObscure,
-                        onToggleObscure: viewModel.toggleObscure,
+                        isObscure: viewModel.isNewPasswordObscure,
+                        onToggleObscure: viewModel.toggleNewPasswordObscure,
                       ),
                       const SizedBox(height: 16),
                       _buildPasswordField(
                         controller: viewModel.confirmPasswordController,
                         label: 'Konfirmasi Password',
                         hint: 'Masukkan kembali password baru',
-                        isObscure: viewModel.isObscure,
-                        onToggleObscure: viewModel.toggleObscure,
+                        isObscure: viewModel.isConfirmPasswordObscure,
+                        onToggleObscure: viewModel.toggleConfirmPasswordObscure,
                       ),
                       const SizedBox(height: 24),
                       SizedBox(
@@ -132,6 +132,17 @@ class ChangePasswordView extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
+                      if (viewModel.errorMessage.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            viewModel.errorMessage,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -188,12 +199,19 @@ class ChangePasswordView extends StatelessWidget {
               ),
               filled: true,
               fillColor: Colors.white,
-              suffixIcon: IconButton(
-                icon: Icon(
-                  isObscure ? Icons.visibility : Icons.visibility_off,
-                  color: const Color(0xFF29455F),
+              suffixIcon: Material(
+                color: Colors.transparent,
+                child: IconButton(
+                  icon: Icon(
+                    isObscure
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    color: const Color(0xFF29455F),
+                    size: 22,
+                  ),
+                  splashRadius: 20,
+                  onPressed: () => onToggleObscure(),
                 ),
-                onPressed: () => onToggleObscure(),
               ),
             ),
           ),

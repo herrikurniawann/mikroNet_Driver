@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:ridehailing/views/widget/logout_button.dart';
 import 'package:ridehailing/views/security/change_password_view.dart';
 import 'package:ridehailing/views/widget/form_label.dart';
@@ -16,34 +15,15 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-  final ImagePicker _picker = ImagePicker();
   File? _imageFile;
 
   @override
   void initState() {
     super.initState();
-    // Jadwalkan fetch setelah build selesai
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final viewModel = Provider.of<ProfileViewModel>(context, listen: false);
       viewModel.fetchDriverData();
     });
-  }
-
-  Future<void> _pickImage() async {
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.gallery);
-
-    // Periksa apakah widget masih terpasang setelah operasi asinkron
-    if (!mounted) return;
-
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = File(pickedFile.path);
-      });
-
-      final viewModel = Provider.of<ProfileViewModel>(context, listen: false);
-      await viewModel.updateProfilePicture(_imageFile!);
-    }
   }
 
   void _showSuccessMessage(String message) {
@@ -68,9 +48,6 @@ class _ProfileViewState extends State<ProfileView> {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<ProfileViewModel>(context);
     final state = viewModel.state;
-
-    // Debug print to track state changes
-    debugPrint('ProfileView build - isEditing: ${state.isEditing}');
 
     if (state.isLoading) {
       return const Scaffold(
@@ -102,18 +79,15 @@ class _ProfileViewState extends State<ProfileView> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                // Profile header section with image
                 Stack(
                   alignment: Alignment.center,
                   clipBehavior: Clip.none,
                   children: [
-                    // Background header
                     Container(
                       color: const Color.fromARGB(255, 0x29, 0x45, 0x5F),
                       width: double.infinity,
                       height: 80,
                     ),
-                    // Profile picture
                     Positioned(
                       bottom: -40,
                       child: Stack(
@@ -151,29 +125,7 @@ class _ProfileViewState extends State<ProfileView> {
                                       size: 40, color: Colors.grey)
                                   : null,
                             ),
-                          ),
-                          // Edit image button
-                          if (state.isEditing)
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.blue,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                      color: Colors.white, width: 1.5),
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(Icons.camera_alt,
-                                      color: Colors.white, size: 18),
-                                  onPressed: _pickImage,
-                                  constraints: const BoxConstraints.tightFor(
-                                      width: 34, height: 34),
-                                  padding: EdgeInsets.zero,
-                                ),
-                              ),
-                            ),
+                          ), // Edit image button
                         ],
                       ),
                     ),
@@ -283,10 +235,6 @@ class _ProfileViewState extends State<ProfileView> {
                         width: 170,
                         child: ElevatedButton.icon(
                           onPressed: () async {
-                            // Debug log
-                            debugPrint(
-                                'Edit/Save button pressed. isEditing: ${state.isEditing}');
-
                             if (state.isEditing) {
                               try {
                                 final success = await viewModel.saveChanges();
@@ -305,11 +253,7 @@ class _ProfileViewState extends State<ProfileView> {
                               }
                             } else {
                               viewModel.toggleEditMode();
-                              // Force UI refresh if needed
                               setState(() {});
-                              // Debug log untuk memverifikasi state
-                              debugPrint(
-                                  'Toggle edit mode. New isEditing state: ${viewModel.state.isEditing}');
                             }
                           },
                           icon: Icon(
@@ -365,12 +309,8 @@ class _ProfileViewState extends State<ProfileView> {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 10),
-
-                      // Logout Button
                       const LogoutButton(),
-
                       const SizedBox(height: 24),
                     ],
                   ),

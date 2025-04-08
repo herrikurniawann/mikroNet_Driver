@@ -4,18 +4,35 @@ import 'package:ridehailing/controllers/security/change_password_api.dart';
 class ChangePasswordViewModel extends ChangeNotifier {
   final TextEditingController oldPasswordController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
-  bool _isObscure = true;
+  // Tiga variabel obscure terpisah
+  bool _isOldPasswordObscure = true;
+  bool _isNewPasswordObscure = true;
+  bool _isConfirmPasswordObscure = true;
+
   bool _isLoading = false;
   String _errorMessage = '';
 
-  bool get isObscure => _isObscure;
+  bool get isOldPasswordObscure => _isOldPasswordObscure;
+  bool get isNewPasswordObscure => _isNewPasswordObscure;
+  bool get isConfirmPasswordObscure => _isConfirmPasswordObscure;
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
-  void toggleObscure() {
-    _isObscure = !_isObscure;
+  void toggleOldPasswordObscure() {
+    _isOldPasswordObscure = !_isOldPasswordObscure;
+    notifyListeners();
+  }
+
+  void toggleNewPasswordObscure() {
+    _isNewPasswordObscure = !_isNewPasswordObscure;
+    notifyListeners();
+  }
+
+  void toggleConfirmPasswordObscure() {
+    _isConfirmPasswordObscure = !_isConfirmPasswordObscure;
     notifyListeners();
   }
 
@@ -24,7 +41,9 @@ class ChangePasswordViewModel extends ChangeNotifier {
     final String newPassword = newPasswordController.text.trim();
     final String confirmNewPassword = confirmPasswordController.text.trim();
 
-    if (oldPassword.isEmpty || newPassword.isEmpty || confirmNewPassword.isEmpty) {
+    if (oldPassword.isEmpty ||
+        newPassword.isEmpty ||
+        confirmNewPassword.isEmpty) {
       _errorMessage = 'Semua field harus diisi';
       notifyListeners();
       if (context.mounted) {
@@ -70,7 +89,6 @@ class ChangePasswordViewModel extends ChangeNotifier {
       _isLoading = false;
       _errorMessage = 'Terjadi kesalahan: $e';
       notifyListeners();
-
       if (context.mounted) {
         showSnackBar(context, _errorMessage, Colors.red);
       }

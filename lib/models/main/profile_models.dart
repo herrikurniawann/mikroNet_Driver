@@ -37,13 +37,11 @@ class ProfileViewModel extends ChangeNotifier {
   final TextEditingController licenseController = TextEditingController();
   final TextEditingController simController = TextEditingController();
 
-  // Backup untuk jika user cancel editing
   String _originalName = '';
   String _originalEmail = '';
   String _originalLicense = '';
   String _originalSim = '';
 
-  // Initialize state
   ProfileState _state = ProfileState();
   ProfileState get state => _state;
 
@@ -103,24 +101,20 @@ class ProfileViewModel extends ChangeNotifier {
 
       await ApiService.updateDriver(updatedData);
 
-      // After successful update, refresh driver data
       final data = await ApiService.fetchDriver();
       _state =
           _state.copyWith(driver: data, isEditing: false, isLoading: false);
 
-      // Update controllers with fresh data
       nameController.text = data.name;
       emailController.text = data.email;
       licenseController.text = data.licenseNumber;
       simController.text = data.sim;
 
-      // Save new original values
       _saveOriginalValues();
 
       notifyListeners();
       return true;
     } catch (e) {
-      debugPrint('Error saving changes: ${e.toString()}');
       _state = _state.copyWith(isLoading: false);
       notifyListeners();
       return false;
@@ -134,14 +128,12 @@ class ProfileViewModel extends ChangeNotifier {
 
       await ApiService.uploadProfilePicture(imageFile);
 
-      // After successful upload, refresh driver data
       final data = await ApiService.fetchDriver();
       _state = _state.copyWith(driver: data, isUploadingImage: false);
 
       notifyListeners();
       return true;
     } catch (e) {
-      debugPrint('Error uploading profile picture: ${e.toString()}');
       _state = _state.copyWith(isUploadingImage: false);
       notifyListeners();
       return false;
@@ -149,25 +141,15 @@ class ProfileViewModel extends ChangeNotifier {
   }
 
   void toggleEditMode() {
-    debugPrint('toggleEditMode: Current isEditing=${_state.isEditing}');
-
-    // Create a new state with the toggled isEditing value
     bool newEditingState = !_state.isEditing;
     _state = _state.copyWith(isEditing: newEditingState);
-
-    debugPrint('toggleEditMode: New isEditing=$newEditingState');
-
-    // Save original values when entering edit mode
     if (newEditingState) {
       _saveOriginalValues();
     }
-
-    // Make sure to call notifyListeners to update all consumers
     notifyListeners();
   }
 
   void cancelEdit() {
-    debugPrint('cancelEdit: Restoring original values');
     _restoreOriginalValues();
     _state = _state.copyWith(isEditing: false);
     notifyListeners();

@@ -20,9 +20,6 @@ class FormFieldWithLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Debug print to verify isEditing state
-    debugPrint('FormFieldWithLabel: $label isEditing=$isEditing');
-    
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [

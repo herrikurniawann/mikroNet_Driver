@@ -128,16 +128,17 @@ class RegisterPage extends StatelessWidget {
           onTap: model.pickProfileImage,
           child: Stack(
             children: [
-              CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.grey[300],
-                backgroundImage: model.profileImage != null
-                    ? FileImage(model.profileImage!)
-                    : null,
-                child: model.profileImage == null
-                    ? const Icon(Icons.camera_alt, size: 40, color: Colors.grey)
-                    : null,
-              ),
+              model.profileImage != null
+                  ? CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.grey[300],
+                      backgroundImage: FileImage(model.profileImage!),
+                    )
+                  : const CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.grey,
+                      child: Icon(Icons.camera_alt, size: 40, color: Colors.white),
+                    ),
               Positioned(
                 bottom: 0,
                 right: 0,

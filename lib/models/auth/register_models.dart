@@ -14,7 +14,8 @@ class RegisterViewModel extends ChangeNotifier {
   final TextEditingController licenseNumberController = TextEditingController();
   final TextEditingController simController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController passwordConfirmationController = TextEditingController();
+  final TextEditingController passwordConfirmationController =
+      TextEditingController();
 
   bool isObscure = true;
   bool isConfirmObscure = true;
@@ -27,13 +28,12 @@ class RegisterViewModel extends ChangeNotifier {
     if (value == null || value.isEmpty) {
       return 'Nama tidak boleh kosong';
     }
-    if (value.length < 3) {
-      return 'Nama minimal 3 karakter';
+    if (value.length < 10) {
+      return 'Nama minimal 10 karakter';
     }
     return null;
   }
 
-  // Validasi untuk email (harus berformat email valid)
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Email tidak boleh kosong';
@@ -45,7 +45,6 @@ class RegisterViewModel extends ChangeNotifier {
     return null;
   }
 
-  // Validasi untuk nomor telepon
   String? validatePhone(String? value) {
     if (value == null || value.isEmpty) {
       return 'Nomor telepon tidak boleh kosong';
@@ -59,7 +58,6 @@ class RegisterViewModel extends ChangeNotifier {
     return null;
   }
 
-  // Validasi untuk nomor lisensi
   String? validateLicense(String? value) {
     if (value == null || value.isEmpty) {
       return 'Nomor lisensi tidak boleh kosong';
@@ -67,7 +65,6 @@ class RegisterViewModel extends ChangeNotifier {
     return null;
   }
 
-  // Validasi untuk nomor SIM
   String? validateSIM(String? value) {
     if (value == null || value.isEmpty) {
       return 'Nomor SIM tidak boleh kosong';
@@ -78,7 +75,6 @@ class RegisterViewModel extends ChangeNotifier {
     return null;
   }
 
-  // Validasi untuk password
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Password tidak boleh kosong';
@@ -197,7 +193,8 @@ class RegisterViewModel extends ChangeNotifier {
           barrierDismissible: false,
           builder: (context) => AlertDialog(
             title: const Text('Pendaftaran Berhasil'),
-            content: const Text('Pendaftaran berhasil! Silakan tunggu validasi dari admin. Anda akan diarahkan ke halaman login.'),
+            content: const Text(
+                'Pendaftaran berhasil! Silakan tunggu validasi dari admin. Anda akan diarahkan ke halaman login.'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -218,7 +215,7 @@ class RegisterViewModel extends ChangeNotifier {
     } catch (e) {
       isLoading = false;
       notifyListeners();
-      
+
       if (!context.mounted) return;
       showErrorDialog(context, 'Terjadi kesalahan: ${e.toString()}');
     }
