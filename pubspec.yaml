@@ -27,6 +27,11 @@ environment:
 # dependencies can be manually updated by changing the version numbers below to
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
+flutter_icons:
+  android: true
+  image_path: "assets/images/ridehailing.jpeg"
+
+
 dependencies:
   flutter:
     sdk: flutter
@@ -49,6 +54,7 @@ dependencies:
   intl: ^0.20.2
   http_parser: ^4.1.2
   path: ^1.9.0
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
