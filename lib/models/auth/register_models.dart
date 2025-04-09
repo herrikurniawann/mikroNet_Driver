@@ -23,7 +23,6 @@ class RegisterViewModel extends ChangeNotifier {
   File? ktpImage;
   bool isLoading = false;
 
-  // Validasi untuk nama (minimal 3 karakter)
   String? validateName(String? value) {
     if (value == null || value.isEmpty) {
       return 'Nama tidak boleh kosong';
@@ -165,7 +164,6 @@ class RegisterViewModel extends ChangeNotifier {
       return;
     }
 
-    // Tampilkan loading indicator
     isLoading = true;
     notifyListeners();
 
