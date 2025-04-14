@@ -280,8 +280,6 @@ class _ProfileViewState extends State<ProfileView> {
                       ),
 
                       const SizedBox(height: 10),
-
-                      // Change Password Button
                       SizedBox(
                         width: 170,
                         child: ElevatedButton.icon(

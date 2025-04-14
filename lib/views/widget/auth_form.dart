@@ -27,7 +27,7 @@ class AuthFormFields {
             suffixIcon: isPassword
                 ? IconButton(
                     icon: Icon(
-                        isObscure ? Icons.visibility : Icons.visibility_off),
+                        isObscure ? Icons.visibility_off : Icons.visibility),
                     onPressed: onToggleObscure,
                   )
                 : null,

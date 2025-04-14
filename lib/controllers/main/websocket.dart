@@ -14,7 +14,6 @@ class WebSocketService {
   final Function()? onDisconnected;
   Position? _lastPosition;
 
-  // Define minimum distance threshold (in meters)
   final double _minDistance = 10.0;
 
   WebSocketService({this.onLocationUpdated, this.onDisconnected});
@@ -24,18 +23,14 @@ class WebSocketService {
     if (token == null) {
       return;
     }
-
-    // Use the original URL from your code
     const wsUrl = 'ws://188.166.179.146:8000/api/tracking/ws/location';
 
     try {
-      // Load last known position from cache
       LatLng? cachedLocation = await getCachedDriverLocation();
       if (cachedLocation != null && onLocationUpdated != null) {
         onLocationUpdated!(cachedLocation);
       }
 
-      // More basic connection without extra parameters that might cause issues
       _channel = IOWebSocketChannel.connect(
         Uri.parse(wsUrl),
         headers: {
@@ -94,13 +89,10 @@ class WebSocketService {
 
   void _startLocationUpdates(String driverId) {
     _locationUpdateTimer?.cancel();
-
-    // Use a simple approach first to reduce complexity
     _locationUpdateTimer = Timer.periodic(
       const Duration(seconds: 5),
       (_) async {
         try {
-          // Menggunakan LocationSettings sebagai pengganti desiredAccuracy
           const locationSettings = LocationSettings(
             accuracy: LocationAccuracy.high,
             distanceFilter: 0,
@@ -110,7 +102,6 @@ class WebSocketService {
             locationSettings: locationSettings,
           );
 
-          // Check if position changed significantly
           bool shouldSend = true;
           if (_lastPosition != null) {
             double distance = Geolocator.distanceBetween(
@@ -120,7 +111,6 @@ class WebSocketService {
               position.longitude,
             );
 
-            // Only send if moved more than minimum distance
             shouldSend = distance >= _minDistance;
           }
 
@@ -133,15 +123,12 @@ class WebSocketService {
               "lng": position.longitude
             };
 
-            // Cache location
             _cacheDriverLocation(position.latitude, position.longitude);
 
-            // Send to server if connected
             if (_channel != null) {
               _channel!.sink.add(jsonEncode(data));
             }
 
-            // Update UI
             if (onLocationUpdated != null) {
               onLocationUpdated!(LatLng(position.latitude, position.longitude));
             }

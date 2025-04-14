@@ -238,7 +238,6 @@ class _MainViewState extends State<MainView>
             padding: const EdgeInsets.only(right: 8.0),
             child: Row(
               children: [
-                // Trip History Icon Button
                 IconButton(
                   icon: const Icon(Icons.history, color: Colors.white),
                   tooltip: 'Riwayat Perjalanan',

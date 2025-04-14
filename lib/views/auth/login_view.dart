@@ -45,11 +45,9 @@ class _LoginPageState extends State<LoginPage>
 
   @override
   Widget build(BuildContext context) {
-    // Buat ChangeNotifierProvider lokal untuk halaman ini
     return ChangeNotifierProvider(
       create: (_) => LoginViewModel(),
       child: Consumer<LoginViewModel>(builder: (context, loginViewModel, _) {
-        // Pindahkan checkLoginStatusAndNavigate ke sini
         WidgetsBinding.instance.addPostFrameCallback((_) {
           loginViewModel.checkLoginStatusAndNavigate(context);
         });
@@ -151,8 +149,6 @@ class _LoginPageState extends State<LoginPage>
   }
 
   Widget buildPasswordField(LoginViewModel viewModel) {
-    // Gunakan Consumer khusus untuk bagian Password saja
-    // agar hanya bagian ini yang di-rebuild saat isObscure berubah
     return TextFormField(
       controller: viewModel.passwordController,
       validator: viewModel.validatePassword,
@@ -166,8 +162,8 @@ class _LoginPageState extends State<LoginPage>
           child: IconButton(
             icon: Icon(
               viewModel.isObscure
-                  ? Icons.visibility_outlined
-                  : Icons.visibility_off_outlined,
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined,
               color: const Color(0xFF29455F),
               size: 22,
             ),

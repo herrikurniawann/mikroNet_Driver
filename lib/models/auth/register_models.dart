@@ -27,8 +27,8 @@ class RegisterViewModel extends ChangeNotifier {
     if (value == null || value.isEmpty) {
       return 'Nama tidak boleh kosong';
     }
-    if (value.length < 10) {
-      return 'Nama minimal 10 karakter';
+      if (value.length < 7) {
+      return 'Nama minimal 7 karakter';
     }
     return null;
   }

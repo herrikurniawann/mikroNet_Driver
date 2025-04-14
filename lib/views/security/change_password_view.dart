@@ -204,8 +204,8 @@ class ChangePasswordView extends StatelessWidget {
                 child: IconButton(
                   icon: Icon(
                     isObscure
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
                     color: const Color(0xFF29455F),
                     size: 22,
                   ),
