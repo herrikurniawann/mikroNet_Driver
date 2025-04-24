@@ -11,12 +11,16 @@ class WebSocketService {
   WebSocketChannel? _channel;
   Timer? _locationUpdateTimer;
   final Function(LatLng)? onLocationUpdated;
+  final Function(List<Map<String, dynamic>>)? onOtherLocationsUpdated;
   final Function()? onDisconnected;
-  Position? _lastPosition;
+  Position? _lastSentPosition;
 
   final double _minDistance = 10.0;
 
-  WebSocketService({this.onLocationUpdated, this.onDisconnected});
+  WebSocketService(
+      {this.onLocationUpdated,
+      this.onOtherLocationsUpdated,
+      this.onDisconnected});
 
   Future<void> connect(String driverId) async {
     final token = await LocalStorage.getToken();
@@ -43,9 +47,24 @@ class WebSocketService {
         (message) {
           try {
             final data = jsonDecode(message);
+
             if (data['user_id'] == driverId && onLocationUpdated != null) {
               final location = LatLng(data['lat'], data['lng']);
               onLocationUpdated!(location);
+            }
+
+            if (data is List && onOtherLocationsUpdated != null) {
+              final locations = data
+                  .map((item) => {
+                        'user_id': item['user_id'],
+                        'lat': item['lat'],
+                        'lng': item['lng'],
+                        'role': item['role'] ?? 'unknown',
+                      })
+                  .toList();
+
+              onOtherLocationsUpdated!(
+                  List<Map<String, dynamic>>.from(locations));
             }
           } catch (e) {
             return;
@@ -97,40 +116,41 @@ class WebSocketService {
             accuracy: LocationAccuracy.high,
             distanceFilter: 0,
           );
-          
+
           Position position = await Geolocator.getCurrentPosition(
             locationSettings: locationSettings,
           );
 
-          bool shouldSend = true;
-          if (_lastPosition != null) {
+          if (onLocationUpdated != null) {
+            onLocationUpdated!(LatLng(position.latitude, position.longitude));
+          }
+
+          bool shouldSendToServer = true;
+          if (_lastSentPosition != null) {
             double distance = Geolocator.distanceBetween(
-              _lastPosition!.latitude,
-              _lastPosition!.longitude,
+              _lastSentPosition!.latitude,
+              _lastSentPosition!.longitude,
               position.latitude,
               position.longitude,
             );
 
-            shouldSend = distance >= _minDistance;
+            shouldSendToServer = distance >= _minDistance;
           }
 
-          if (shouldSend) {
-            _lastPosition = position;
+          _cacheDriverLocation(position.latitude, position.longitude);
+
+          if (shouldSendToServer) {
+            _lastSentPosition = position;
 
             final data = {
               "user_id": driverId,
               "lat": position.latitude,
-              "lng": position.longitude
+              "lng": position.longitude,
+              "role": "driver"
             };
-
-            _cacheDriverLocation(position.latitude, position.longitude);
 
             if (_channel != null) {
               _channel!.sink.add(jsonEncode(data));
-            }
-
-            if (onLocationUpdated != null) {
-              onLocationUpdated!(LatLng(position.latitude, position.longitude));
             }
           }
         } catch (e) {

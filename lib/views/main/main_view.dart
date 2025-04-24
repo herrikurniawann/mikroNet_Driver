@@ -8,6 +8,9 @@ import 'package:ridehailing/models/main/data.dart';
 import 'package:ridehailing/views/main/profile_view.dart';
 import 'package:ridehailing/views/main/trip_history_view.dart';
 import 'package:ridehailing/controllers/main/websocket.dart';
+import 'package:ridehailing/controllers/main/trip_alert_services.dart';
+import 'package:ridehailing/models/main/trip_history.dart';
+import 'package:ridehailing/views/widget/trip_alert_widget.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -55,6 +58,7 @@ class _MainViewState extends State<MainView>
   @override
   void dispose() {
     _disconnectWebSocket();
+    TripAlertService.stopMonitoring();
     _animationController.dispose();
     super.dispose();
   }
@@ -68,6 +72,7 @@ class _MainViewState extends State<MainView>
         isLoading = false;
       });
       _manageWebSocket();
+      _manageTripAlerts();
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -91,6 +96,7 @@ class _MainViewState extends State<MainView>
         }
       });
       _manageWebSocket();
+      _manageTripAlerts();
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -105,6 +111,32 @@ class _MainViewState extends State<MainView>
     } else {
       _disconnectWebSocket();
     }
+  }
+  
+  void _manageTripAlerts() {
+    if (isOnline) {
+      // Start monitoring for new trips when driver is online
+      TripAlertService.startMonitoring(_showTripAlert);
+    } else {
+      // Stop monitoring when driver goes offline
+      TripAlertService.stopMonitoring();
+    }
+  }
+  
+  void _showTripAlert(TripHistory trip) {
+    if (!mounted) return;
+    
+    // Show the alert dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => TripAlertWidget(
+        trip: trip,
+        onDismiss: () {
+          Navigator.of(context).pop();
+        },
+      ),
+    );
   }
 
   Future<void> _connectWebSocket() async {

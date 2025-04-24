@@ -247,8 +247,11 @@ class _LoginPageState extends State<LoginPage>
   }
 
   Widget buildRegisterLink(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 4,
+      runSpacing: 4,
       children: [
         const Text(
           'Belum punya akun?',

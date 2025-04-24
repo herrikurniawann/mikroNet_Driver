@@ -195,15 +195,13 @@ class _TripHistoryViewState extends State<TripHistoryView>
                 ),
               )
             else
-              // Trip History List
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: tripHistory.length + 1, // +1 for the header
+                  itemCount: tripHistory.length + 1,
                   itemBuilder: (context, index) {
                     if (index == 0) {
-                      // Header with summary
                       return _buildSummaryCard();
                     }
                     final trip = tripHistory[index - 1];
@@ -220,7 +218,6 @@ class _TripHistoryViewState extends State<TripHistoryView>
   Widget _buildSummaryCard() {
     if (tripHistory.isEmpty) return const SizedBox.shrink();
 
-    // Calculate total earnings
     final totalEarnings = tripHistory.fold(0, (sum, trip) => sum + trip.amount);
     final totalTrips = tripHistory.length;
 
@@ -421,7 +418,8 @@ class _TripHistoryViewState extends State<TripHistoryView>
   }
 
   String _formatTime(DateTime dateTime) {
-    final formatter = DateFormat('HH:mm', 'id');
-    return formatter.format(dateTime);
+    final gmt8Time = dateTime.toUtc().add(const Duration(hours: 8));
+    final formattedDate = DateFormat("HH:mm").format(gmt8Time);
+    return formattedDate;
   }
 }

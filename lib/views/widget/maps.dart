@@ -9,8 +9,14 @@ import 'dart:async';
 class MapScreen extends StatefulWidget {
   final String? driverId;
   final LatLng? driverPosition;
+  final List<Map<String, dynamic>>? otherLocations;
 
-  const MapScreen({super.key, this.driverId, this.driverPosition});
+  const MapScreen({
+    super.key,
+    this.driverId,
+    this.driverPosition,
+    this.otherLocations,
+  });
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -19,12 +25,13 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   List<LatLng> routePoints = [];
   List<Marker> locationMarkers = [];
+  List<Marker> otherUserMarkers =
+      [];
   Timer? _pulseTimer;
   bool _isPulsing = false;
   double _markerScale = 1.0;
   late MapController _mapController;
 
-  // Define route points
   final List<Map<String, dynamic>> routeLocations = [
     {
       'point': const LatLng(1.4576477649812942, 124.806202431662),
@@ -50,6 +57,10 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     _setupLocationMarkers();
     fetchRoute();
     _startPulseAnimation();
+
+    if (widget.otherLocations != null) {
+      _updateOtherUsersMarkers();
+    }
   }
 
   @override
@@ -61,17 +72,116 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   @override
   void didUpdateWidget(MapScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Ensure the route doesn't disappear when the widget updates
     if (routePoints.isEmpty) {
       fetchRoute();
     }
 
-    // If the driver position changes, update the map view
     if (widget.driverPosition != null &&
         (oldWidget.driverPosition == null ||
             widget.driverPosition != oldWidget.driverPosition)) {
       _centerOnDriverPosition();
     }
+
+    if (widget.otherLocations != oldWidget.otherLocations) {
+      _updateOtherUsersMarkers();
+    }
+  }
+
+  void _updateOtherUsersMarkers() {
+    if (widget.otherLocations == null || widget.otherLocations!.isEmpty) {
+      setState(() {
+        otherUserMarkers = [];
+      });
+      return;
+    }
+
+    setState(() {
+      otherUserMarkers = widget.otherLocations!
+          .map((userData) {
+            if (userData['user_id'] == widget.driverId) {
+              return null;
+            }
+
+            final position = LatLng(userData['lat'], userData['lng']);
+            final role = userData['role'] ?? 'unknown';
+
+            Widget markerIcon;
+            Color markerColor;
+
+            if (role == 'driver') {
+              markerIcon = SvgPicture.asset(
+                'assets/svg/cars.svg',
+                width: 35,
+                height: 35,
+              );
+              markerColor = Colors.green;
+            } else if (role == 'user') {
+              markerIcon = const Icon(
+                Icons.person_pin_circle,
+                size: 35,
+                color: Colors.orange,
+              );
+              markerColor = Colors.orange;
+            } else {
+              markerIcon = const Icon(
+                Icons.location_on,
+                size: 35,
+                color: Colors.purple,
+              );
+              markerColor = Colors.purple;
+            }
+
+            return Marker(
+              width: 60.0,
+              height: 60.0,
+              point: position,
+              child: Column(
+                children: [
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: markerColor.withValues(alpha: 0.3),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      markerIcon,
+                    ],
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(4),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      role == 'driver'
+                          ? 'Driver'
+                          : (role == 'user' ? 'User' : 'Unknown'),
+                      style: const TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          })
+          .where((marker) => marker != null)
+          .cast<Marker>()
+          .toList();
+    });
   }
 
   void _centerOnDriverPosition() {
@@ -91,13 +201,11 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: (location['color'] as Color)
-                    .withValues(red: null, green: null, blue: null, alpha: 0.9),
+                color: (location['color'] as Color).withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(6),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(
-                        red: null, green: null, blue: null, alpha: 0.2),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -113,13 +221,11 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.white
-                    .withValues(red: null, green: null, blue: null, alpha: 0.9),
+                color: Colors.white.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(4),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(
-                        red: null, green: null, blue: null, alpha: 0.1),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 4,
                   ),
                 ],
@@ -146,7 +252,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         _markerScale = 1.0;
       });
 
-      // Simple animation sequence
       Future.delayed(const Duration(milliseconds: 150), () {
         if (!mounted) return;
         setState(() {
@@ -193,7 +298,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         });
       }
     } catch (e) {
-      // If the route fetch fails, we'll try again after a brief delay
       if (mounted) {
         Future.delayed(const Duration(seconds: 5), () {
           if (mounted && routePoints.isEmpty) {
@@ -226,7 +330,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 subdomains: const ['a', 'b', 'c', 'd'],
                 userAgentPackageName: 'com.ridehailing.app',
               ),
-              // Route polyline - always show when available
               if (routePoints.isNotEmpty)
                 PolylineLayer(
                   polylines: [
@@ -242,7 +345,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                     ),
                   ],
                 ),
-              // Driver position marker
+              if (otherUserMarkers.isNotEmpty)
+                MarkerLayer(markers: otherUserMarkers),
               if (widget.driverPosition != null)
                 MarkerLayer(
                   markers: [
@@ -261,11 +365,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                                 width: 50,
                                 height: 50,
                                 decoration: BoxDecoration(
-                                  color: Colors.blue.withValues(
-                                      red: null,
-                                      green: null,
-                                      blue: null,
-                                      alpha: 0.3),
+                                  color: Colors.blue.withValues(alpha: 0.3),
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -280,7 +380,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                     ),
                   ],
                 ),
-              // Location markers for route points
               MarkerLayer(markers: locationMarkers),
             ],
           ),
@@ -291,7 +390,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // My location button
                 FloatingActionButton(
                   heroTag: 'myLocation',
                   mini: true,
@@ -303,7 +401,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   ),
                 ),
                 const SizedBox(height: 8),
-                // Zoom in button
                 FloatingActionButton(
                   heroTag: 'zoomIn',
                   mini: true,
@@ -321,7 +418,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   ),
                 ),
                 const SizedBox(height: 8),
-                // Zoom out button
                 FloatingActionButton(
                   heroTag: 'zoomOut',
                   mini: true,
